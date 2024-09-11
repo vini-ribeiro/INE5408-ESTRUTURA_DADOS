@@ -1,0 +1,18 @@
+Pilha (stack): estrutura linear para organizar elementos. Seu funcionamente é da filosifia FILO (primeiro que entra é o último que sai).
+
+Operações básicas:
+	Empilhar;
+	Desempilhar;
+	Consulta ao topo;
+
+O exemplo mais famoso é a pilha de chamada de função (stackoverflow acontece que uma pilha de chamada de função passa do limite suportado pelo sistema operacional).
+
+ex;
+int fib(unsigned int n) {
+	if (n <= 2) return 1;
+
+	return fib(n - 1) + fib(n - 2);
+}
+
+ex pilha de aninhamento: verifica a abertura e o fechamento de procedencia
+
