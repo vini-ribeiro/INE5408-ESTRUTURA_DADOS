@@ -1,0 +1,1 @@
+Não é possível separar a implementação de métodos template em arquivos .h e .cpp.
