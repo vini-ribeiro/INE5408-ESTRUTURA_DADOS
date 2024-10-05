@@ -1,0 +1,14 @@
+==19337== Memcheck, a memory error detector
+==19337== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==19337== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==19337== Command: ./a.out
+==19337== Parent PID: 3710
+==19337== 
+==19337== 
+==19337== HEAP SUMMARY:
+==19337==     in use at exit: 0 bytes in 0 blocks
+==19337==   total heap usage: 113 allocs, 113 frees, 118,835 bytes allocated
+==19337== 
+==19337== All heap blocks were freed -- no leaks are possible
+==19337== 
+==19337== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

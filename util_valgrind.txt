@@ -1,0 +1,2 @@
+Utilize o comando abaixo para verificar vazamentos de memória
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --log-file=<nome_arquivo_destino_saida_valgrind>txt -s ./<nome_programa>
