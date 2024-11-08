@@ -15,16 +15,17 @@ using namespace std;
 
 class ArquivoXML {
   public:
-    ArquivoXML() : descricaoValidadeXML_(""), texto_(""), xmlValido_(false) {
+    ArquivoXML() : descricaoValidadeXML_(""), texto_(""), xmlValido_(false), qtCenario_(0) {
     }
 
     ~ArquivoXML() {
     }
 
     void limparDados() {
-    	texto_.clear();
-    	descricaoValidadeXML_.clear();
-    	xmlValido_ = false;
+        texto_.clear();
+        descricaoValidadeXML_.clear();
+        xmlValido_ = false;
+        qtCenario_ = 0;
     }
 
     void lerArquivo(string filename) {
@@ -61,6 +62,8 @@ class ArquivoXML {
                     descricaoValidadeXML_ = "erro";
                     return xmlValido_;
                 }
+                if (tag == "cenario")
+                    qtCenario_++;
                 if (tag.at(0) != '/') { // tag de abertura. Empilha
                     pilhaTags_.push(tag);
                     tag.clear();
@@ -86,6 +89,10 @@ class ArquivoXML {
         return xmlValido_;
     }
 
+    size_t qtCenario() {
+        return qtCenario_;
+    }
+
     size_t tamanhoTextoXML() {
         return texto_.length();
     }
@@ -99,29 +106,14 @@ class ArquivoXML {
     }
 
     bool XMLValido() {
-    	return xmlValido_;
+        return xmlValido_;
     }
 
   private:
     string descricaoValidadeXML_;
     string texto_;
     bool xmlValido_;
+    size_t qtCenario_;
 };
 
 #endif
-
-// void extrairCenarios() {
-
-//     if (!xmlValido_)
-//         return;
-
-//     if (quantidadeCenarios_ < 1)
-//         return;
-
-//     Cenario *c = new Cenario(texto_, 0);
-//     cenarios_.push_back(c);
-
-//     for (size_t i = 0; i < quantidadeCenarios_; i++) {
-// 		cenarios_.push_back(new Cenario(texto_, cenarios_.front()->indice_final));
-//     }
-// }
