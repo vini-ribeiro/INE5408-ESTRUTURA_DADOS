@@ -1,5 +1,4 @@
 #include "array_list.h"
-#include <stdexcept>
 
 namespace structures {
 
@@ -38,82 +37,59 @@ template <typename T> class BinaryTree {
         Node *right;
 
         void insert(const T &data_) {
-            // COLOQUE SEU CÓDIGO AQUI... SE IMPLEMENTAÇÃO RECURSIVA
-
             if (data > data_) {
                 if (left == nullptr) {
-                    Node *newNode = new Node(data_);
-                    left = newNode;
+                    left = new Node(data_);
                 } else {
                     left->insert(data_);
                 }
-            }
-
-            if (data < data_) {
+            } else {
                 if (right == nullptr) {
-                    Node *newNode = new Node(data_);
-                    right = newNode;
+                    right = new Node(data_);
                 } else {
                     right->insert(data_);
                 }
             }
         }
 
-        Node *getMaxValueInSubTree(Node *node) {
-            if (node == nullptr)
+        Node *remove(Node *arv, const T &data_) {
+            Node *temp = nullptr;
+
+            if (arv == nullptr) {
                 return nullptr;
-
-            if (node->right == nullptr)
-                return node;
-
-            return getMaxValueInSubTree(node->right);
-        }
-
-        Node *getMinValueInSubTree(Node *node) {
-            if (node == nullptr)
-                return nullptr;
-
-            if (node->left == nullptr)
-                return node;
-
-            return getMinValueInSubTree(node->left);
-        }
-
-        Node *remove(Node *node, const T &data_) {
-            // COLOQUE SEU CÓDIGO AQUI... SE IMPLEMENTAÇÃO RECURSIVA
-            Node *aux, *filho;
-
-            if (node == nullptr)
-                return nullptr;
-
-            if (node->data > data_) {
-                node->left = remove(node->left, data_);
-                return node;
             }
 
-            if (node->data < data_) {
-                node->right = remove(node->right, data_);
-                return node;
+            if (data_ < arv->data) {
+                arv->left = remove(arv->left, data_);
+                return arv;
             }
 
-            if (node->left != nullptr && node->right != nullptr) {
-                aux = getMinValueInSubTree(node->right);
-                node->data = aux->data;
-                node->right = remove(node->right, node->data);
-                return node;
+            if (data_ > arv->data) {
+                arv->right = remove(arv->right, data_);
+                return arv;
             }
 
-            if (node->right != nullptr) {
-                filho = node->right;
-                return filho;
+            if (arv->left != nullptr && arv->right != nullptr) {
+                Node *min = arv->right->getMinimum();
+                arv->data = min->data;
+                arv->right = remove(arv->right, min->data);
+                return arv;
             }
 
-            if (node->left != nullptr) {
-                filho = node->left;
-                return filho;
+            if (arv->left != nullptr) {
+                temp = arv->left;
+                delete arv;
+                return temp;
             }
 
-            delete node;
+            if (arv->right != nullptr) {
+                temp = arv->right;
+                delete arv;
+                return temp;
+            }
+
+            delete arv;
+
             return nullptr;
         }
 
@@ -135,31 +111,41 @@ template <typename T> class BinaryTree {
             }
         }
 
-        void pre_order(ArrayList<T> &v, Node *node) const {
-            // COLOQUE SEU CÓDIGO AQUI...
-            if (node == nullptr)
-                return;
-            v.push_back(node->data);
-            pre_order(v, node->left);
-            pre_order(v, node->right);
+        void pre_order(ArrayList<T> &v) const {
+            v.push_back(data);
+            if (left != nullptr) {
+                left->pre_order(v);
+            }
+            if (right != nullptr) {
+                right->pre_order(v);
+            }
         }
 
-        void in_order(ArrayList<T> &v, Node *node) const {
-            // COLOQUE SEU CÓDIGO AQUI...
-            if (node == nullptr)
-                return;
-            pre_order(v, node->left);
-            v.push_back(node->data);
-            pre_order(v, node->right);
+        void in_order(ArrayList<T> &v) const {
+            if (left != nullptr) {
+                left->in_order(v);
+            }
+            v.push_back(data);
+            if (right != nullptr) {
+                right->in_order(v);
+            }
         }
 
-        void post_order(ArrayList<T> &v, Node *node) const {
-            // COLOQUE SEU CÓDIGO AQUI...
-            if (node == nullptr)
-                return;
-            pre_order(v, node->left);
-            pre_order(v, node->right);
-            v.push_back(node->data);
+        void post_order(ArrayList<T> &v) const {
+            if (left != nullptr) {
+                left->post_order(v);
+            }
+            if (right != nullptr) {
+                right->post_order(v);
+            }
+            v.push_back(data);
+        }
+        Node *getMinimum() {
+            if (left == nullptr) {
+                return this;
+            } else {
+                return left->getMinimum();
+            }
         }
     };
 
@@ -177,20 +163,18 @@ template <typename T> structures::BinaryTree<T>::BinaryTree() {
 }
 
 template <typename T> structures::BinaryTree<T>::~BinaryTree() {
-    // COLOQUE SEU CÓDIGO AQUI...
     if (root != nullptr) {
-        structures::ArrayList<T> list_pre_order = root->pre_order();
-        while (!list_pre_order.empty()) {
-            remove(list_pre_order.pop_back());
+        structures::ArrayList<T> list_nodes = pre_order();
+        while (!list_nodes.empty()) {
+            remove(list_nodes.pop_back());
         }
     }
 }
 
 template <typename T> void structures::BinaryTree<T>::insert(const T &data) {
-    // COLOQUE SEU CÓDIGO AQUI...
-    if (contains(data))
-        throw std::out_of_range("Dado já está na árvore");
-
+    if (contains(data)) {
+        throw std::out_of_range("Elemento já está presente.");
+    }
     if (root == nullptr) {
         root = new Node(data);
     } else {
@@ -200,12 +184,13 @@ template <typename T> void structures::BinaryTree<T>::insert(const T &data) {
 }
 
 template <typename T> void structures::BinaryTree<T>::remove(const T &data) {
-    // COLOQUE SEU CÓDIGO AQUI...
-    if (!contains(data))
-        return;
-
-    root->remove(root, data);
-    size_--;
+    if (root != nullptr) {
+        Node *p = root;
+        p = p->remove(p, data);
+        if (p != nullptr) {
+            size_--;
+        }
+    }
 }
 
 template <typename T> bool structures::BinaryTree<T>::contains(const T &data) const {
@@ -227,25 +212,23 @@ template <typename T> std::size_t structures::BinaryTree<T>::size() const {
 template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::pre_order() const {
     structures::ArrayList<T> L;
     if (root != nullptr) {
-        root->pre_order(L, root);
+        root->pre_order(L);
     }
     return L;
 }
 
 template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::in_order() const {
-    // COLOQUE SEU CÓDIGO AQUI...
     structures::ArrayList<T> L;
     if (root != nullptr) {
-        root->in_order(L, root);
+        root->in_order(L);
     }
     return L;
 }
 
 template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::post_order() const {
-    // COLOQUE SEU CÓDIGO AQUI...
     structures::ArrayList<T> L;
     if (root != nullptr) {
-        root->post_order(L, root);
+        root->post_order(L);
     }
     return L;
 }
