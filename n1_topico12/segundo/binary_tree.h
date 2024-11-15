@@ -1,9 +1,10 @@
-//!  Copyright [2020] <Autor>
+//!  Copyright [2024] VINICIUS HENRIQUE RIBEIRO
 
 #ifndef STRUCTURES_BINARY_TREE_H
 #define STRUCTURES_BINARY_TREE_H
 
 #include "./array_list.h"
+#include <iostream>
 
 namespace structures {
 
@@ -69,6 +70,7 @@ template <typename T> class BinaryTree {
             delete right_;
         }
 
+        size_t level_{0};
         T data_;
         Node *left_{nullptr};
         Node *right_{nullptr};
@@ -83,12 +85,14 @@ template <typename T> class BinaryTree {
                 if (data < aux->data_) {
                     if (aux->left_ == nullptr) {
                         aux->left_ = new Node(data);
+                        aux->left_->level_ = aux->level_ + 1;
                         break;
                     }
                     aux = aux->left_;
                 } else {
                     if (aux->right_ == nullptr) {
                         aux->right_ = new Node(data);
+                        aux->right_->level_ = aux->level_ + 1;
                         break;
                     }
                     aux = aux->right_;
@@ -97,14 +101,14 @@ template <typename T> class BinaryTree {
         }
 
         //! Remoção
-        bool remove(const T &data) {
+        bool remove(const T &data, Node **root) {
             bool existe = false;
             /*
                 COPIE AQUI O CÓDIGO DO EXERCÍCIO ANTERIOR ...
             */
             // verificar a existência pode ser meio inútil, já que no pior caso o nodo existe (é o mais comum)
-            if (this->contains(data)) {
-                this->remove(data, this, existe);
+            if ((*root)->contains(data)) {
+                *root = (*root)->remove(data, *root, existe);
             }
             return existe;
         }
@@ -115,9 +119,9 @@ template <typename T> class BinaryTree {
             /*
                 COPIE AQUI O CÓDIGO DO EXERCÍCIO ANTERIOR ...
             */
-            Node *aux;
+            Node *aux = nullptr;
             if (this->data_ == data) {
-                existe = true;
+                return true;
             } else if (data < this->data_) {
                 aux = this->left_;
             } else {
@@ -153,10 +157,10 @@ template <typename T> class BinaryTree {
                 COPIE AQUI O CÓDIGO DO EXERCÍCIO ANTERIOR ...
             */
             if (left_ != nullptr)
-                left_->pre_order(v);
+                left_->in_order(v);
             v.push_back(data_);
             if (right_ != nullptr)
-                right_->pre_order(v);
+                right_->in_order(v);
         }
 
         //! Pós ordem
@@ -165,9 +169,9 @@ template <typename T> class BinaryTree {
                 COPIE AQUI O CÓDIGO DO EXERCÍCIO ANTERIOR ...
             */
             if (left_ != nullptr)
-                left_->pre_order(v);
+                left_->post_order(v);
             if (right_ != nullptr)
-                right_->pre_order(v);
+                right_->post_order(v);
             v.push_back(data_);
         }
 
@@ -205,6 +209,7 @@ template <typename T> class BinaryTree {
 
             if (arv->left_ != nullptr) {
                 temp = arv->left_;
+                arv->left_ = nullptr;
                 delete arv;
                 deleted = true;
                 return temp;
@@ -212,6 +217,7 @@ template <typename T> class BinaryTree {
 
             if (arv->right_ != nullptr) {
                 temp = arv->right_;
+                arv->right_ = nullptr;
                 delete arv;
                 deleted = true;
                 return temp;
@@ -231,6 +237,16 @@ template <typename T> class BinaryTree {
         }
     };
 
+    void balance(BinaryTree<T> &b, ArrayList<T> &v, int inf, int sup) {
+        if (inf > sup)
+            return;
+
+        int center = (sup + inf) / 2;
+        b.insert(v.at(center));
+        balance(b, v, inf, center - 1);
+        balance(b, v, center + 1, sup);
+    }
+
     Node *root_{nullptr};
     std::size_t size_{0};
 };
@@ -243,7 +259,28 @@ template <typename T> int BinaryTree<T>::height() {
     /*
         COLOQUE SEU CÓDIGO AQUI ...
     */
-    return -1;
+    if (empty())
+        return -1;
+
+    ArrayList<Node *> fila;
+    fila.push_back(root_);
+    Node *aux;
+    int max_h = 0;
+    while (!fila.empty()) {
+        aux = fila.pop_front();
+        if (aux->left_ == nullptr && aux->right_ == nullptr) {
+            if ((int) aux->level_ > max_h)
+                max_h = aux->level_;
+        }
+        if (aux->left_ != nullptr) {
+            fila.push_back(aux->left_);
+        }
+        if (aux->right_ != nullptr) {
+            fila.push_back(aux->right_);
+        }
+    }
+
+    return max_h;
 }
 
 //! (2) contagem do número de folhas:
@@ -251,7 +288,26 @@ template <typename T> int BinaryTree<T>::leaves() {
     /*
         COLOQUE SEU CÓDIGO AQUI ...
     */
-    return 0;
+    if (empty())
+        return 0;
+
+    ArrayList<Node *> fila;
+    fila.push_back(root_);
+    Node *aux;
+    int l = 0;
+    while (!fila.empty()) {
+        aux = fila.pop_front();
+        if (aux->left_ != nullptr) {
+            fila.push_back(aux->left_);
+        }
+        if (aux->right_ != nullptr) {
+            fila.push_back(aux->right_);
+        }
+        if (aux->left_ == nullptr && aux->right_ == nullptr) {
+            l++;
+        }
+    }
+    return l;
 }
 
 //! (3) criação de uma lista com o menor (mínimo) e o maior (máximo)
@@ -284,7 +340,10 @@ template <typename T> BinaryTree<T> BinaryTree<T>::clone() {
     /*
         COLOQUE SEU CÓDIGO AQUI ...
     */
-
+    ArrayList<T> pre_ord = pre_order();
+    while (!pre_ord.empty()) {
+        C.insert(pre_ord.pop_front());
+    }
     return C;
 }
 
@@ -293,6 +352,24 @@ template <typename T> void BinaryTree<T>::filter(int n_child) {
     /*
         COLOQUE SEU CÓDIGO AQUI ...
     */
+    if (empty())
+        throw std::out_of_range("Empty tree");
+
+    ArrayList<Node *> fila;
+    fila.push_back(root_);
+    Node *aux;
+    while (!fila.empty()) {
+        aux = fila.pop_front();
+        if (aux->left_ != nullptr) {
+            fila.push_back(aux->left_);
+        }
+        if (aux->right_ != nullptr) {
+            fila.push_back(aux->right_);
+        }
+        if ((aux->left_ != nullptr) + (aux->right_ != nullptr) == n_child) {
+            remove(aux->data_);
+        }
+    }
 }
 
 //! (6) criação de um nova árvore que tenha todos os valores e a
@@ -303,22 +380,12 @@ template <typename T> BinaryTree<T> BinaryTree<T>::balance() {
     /*
         COLOQUE SEU CÓDIGO AQUI ...
     */
-    if (root_ == nullptr)
+    if (empty())
         return B;
 
-    ArrayList<Node *> fila;
-    fila.push_back(root_);
-    Node *aux;
-    while (!fila.empty()) {
-        aux = fila.pop_front();
-        B.insert(aux->data_);
-        if (aux->left_ != nullptr) {
-            fila.push_back(aux->left_);
-        }
-        if (aux->right_ != nullptr) {
-            fila.push_back(aux->right_);
-        }
-    }
+    ArrayList<T> V = in_order();
+
+    balance(B, V, 0, V.size() - 1);
 
     return B;
 }
@@ -352,7 +419,7 @@ template <typename T> void BinaryTree<T>::remove(const T &data) {
         throw std::out_of_range("Empty tree");
 
     if (size() != 1u) {
-        if (root_->remove(data))
+        if (root_->remove(data, &root_))
             --size_;
     } else {
         if (root_->data_ == data) {
