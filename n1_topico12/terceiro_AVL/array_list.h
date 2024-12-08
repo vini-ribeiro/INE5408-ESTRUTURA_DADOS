@@ -8,8 +8,9 @@
 
 namespace structures {
 
-template <typename T> class ArrayList {
-  public:
+template <typename T>
+class ArrayList {
+   public:
     ArrayList();
     explicit ArrayList(std::size_t max_size);
     ~ArrayList();
@@ -35,49 +36,56 @@ template <typename T> class ArrayList {
     const T &operator[](std::size_t index) const;
     // descricao do 'operator []' na FAQ da disciplina
 
-  private:
+   private:
     T *contents;
     std::size_t size_;
     std::size_t max_size_;
 
-    static const auto DEFAULT_MAX = 10u;
+    static const auto DEFAULT_MAX = 1000u;
 };
 
-} // namespace structures
+}  // namespace structures
 
 #endif
 
 //-------------------------------------
 
-template <typename T> structures::ArrayList<T>::ArrayList() {
+template <typename T>
+structures::ArrayList<T>::ArrayList() {
     max_size_ = DEFAULT_MAX;
-    contents = new T[max_size_];
-    size_ = 0;
+    contents  = new T[max_size_];
+    size_     = 0;
 }
 
-template <typename T> structures::ArrayList<T>::ArrayList(std::size_t max_size) {
+template <typename T>
+structures::ArrayList<T>::ArrayList(std::size_t max_size) {
     max_size_ = max_size;
-    contents = new T[max_size_];
-    size_ = 0;
+    contents  = new T[max_size_];
+    size_     = 0;
 }
 
-template <typename T> structures::ArrayList<T>::~ArrayList() {
+template <typename T>
+structures::ArrayList<T>::~ArrayList() {
     delete[] contents;
 }
 
-template <typename T> void structures::ArrayList<T>::clear() {
+template <typename T>
+void structures::ArrayList<T>::clear() {
     size_ = 0;
 }
 
-template <typename T> void structures::ArrayList<T>::push_back(const T &data) {
+template <typename T>
+void structures::ArrayList<T>::push_back(const T &data) {
     insert(data, size());
 }
 
-template <typename T> void structures::ArrayList<T>::push_front(const T &data) {
+template <typename T>
+void structures::ArrayList<T>::push_front(const T &data) {
     insert(data, 0);
 }
 
-template <typename T> void structures::ArrayList<T>::insert(const T &data, std::size_t index) {
+template <typename T>
+void structures::ArrayList<T>::insert(const T &data, std::size_t index) {
     if (index > size()) {
         throw std::out_of_range("invalid index");
     }
@@ -91,7 +99,8 @@ template <typename T> void structures::ArrayList<T>::insert(const T &data, std::
     size_++;
 }
 
-template <typename T> void structures::ArrayList<T>::insert_sorted(const T &data) {
+template <typename T>
+void structures::ArrayList<T>::insert_sorted(const T &data) {
     std::size_t i;
     for (i = 0; i < size() && contents[i] < data; i++) {
         continue;
@@ -99,7 +108,8 @@ template <typename T> void structures::ArrayList<T>::insert_sorted(const T &data
     insert(data, i);
 }
 
-template <typename T> T structures::ArrayList<T>::pop(std::size_t index) {
+template <typename T>
+T structures::ArrayList<T>::pop(std::size_t index) {
     if (empty()) {
         throw std::out_of_range("empty list");
     } else if (index >= size()) {
@@ -113,12 +123,14 @@ template <typename T> T structures::ArrayList<T>::pop(std::size_t index) {
     return aux;
 }
 
-template <typename T> T structures::ArrayList<T>::pop_back() {
+template <typename T>
+T structures::ArrayList<T>::pop_back() {
     T aux = pop(size() - 1);
     return aux;
 }
 
-template <typename T> T structures::ArrayList<T>::pop_front() {
+template <typename T>
+T structures::ArrayList<T>::pop_front() {
     if (empty()) {
         throw std::out_of_range("empty list");
     }
@@ -130,7 +142,8 @@ template <typename T> T structures::ArrayList<T>::pop_front() {
     return aux;
 }
 
-template <typename T> void structures::ArrayList<T>::remove(const T &data) {
+template <typename T>
+void structures::ArrayList<T>::remove(const T &data) {
     for (std::size_t i = 0; i < size(); i++) {
         if (contents[i] == data) {
             pop(i);
@@ -139,20 +152,24 @@ template <typename T> void structures::ArrayList<T>::remove(const T &data) {
     }
 }
 
-template <typename T> bool structures::ArrayList<T>::empty() const {
+template <typename T>
+bool structures::ArrayList<T>::empty() const {
     return (size() == 0);
 }
 
-template <typename T> bool structures::ArrayList<T>::full() const {
+template <typename T>
+bool structures::ArrayList<T>::full() const {
     return (size() == max_size());
 }
 
-template <typename T> bool structures::ArrayList<T>::contains(const T &data) const {
+template <typename T>
+bool structures::ArrayList<T>::contains(const T &data) const {
     std::size_t index = find(data);
     return (index < size());
 }
 
-template <typename T> std::size_t structures::ArrayList<T>::find(const T &data) const {
+template <typename T>
+std::size_t structures::ArrayList<T>::find(const T &data) const {
     for (std::size_t i = 0; i < size(); i++) {
         if (contents[i] == data) {
             return i;
@@ -161,15 +178,18 @@ template <typename T> std::size_t structures::ArrayList<T>::find(const T &data) 
     return size();
 }
 
-template <typename T> std::size_t structures::ArrayList<T>::size() const {
+template <typename T>
+std::size_t structures::ArrayList<T>::size() const {
     return size_;
 }
 
-template <typename T> std::size_t structures::ArrayList<T>::max_size() const {
+template <typename T>
+std::size_t structures::ArrayList<T>::max_size() const {
     return max_size_;
 }
 
-template <typename T> T &structures::ArrayList<T>::at(std::size_t index) {
+template <typename T>
+T &structures::ArrayList<T>::at(std::size_t index) {
     if (empty()) {
         throw std::out_of_range("empty list");
     } else if (index >= size()) {
@@ -178,16 +198,19 @@ template <typename T> T &structures::ArrayList<T>::at(std::size_t index) {
     return contents[index];
 }
 
-template <typename T> T &structures::ArrayList<T>::operator[](std::size_t index) {
+template <typename T>
+T &structures::ArrayList<T>::operator[](std::size_t index) {
     return contents[index];
 }
 
-template <typename T> const T &structures::ArrayList<T>::at(std::size_t index) const {
+template <typename T>
+const T &structures::ArrayList<T>::at(std::size_t index) const {
     const T aux = at(index);
     return aux;
 }
 
-template <typename T> const T &structures::ArrayList<T>::operator[](std::size_t index) const {
+template <typename T>
+const T &structures::ArrayList<T>::operator[](std::size_t index) const {
     const T aux = at(index);
     return aux;
 }

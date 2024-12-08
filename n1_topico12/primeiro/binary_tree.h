@@ -1,9 +1,12 @@
+// Copyright 2024 Vinicius Henrique Ribeiro
+
 #include "array_list.h"
 
 namespace structures {
 
-template <typename T> class BinaryTree {
-  public:
+template <typename T>
+class BinaryTree {
+   public:
     BinaryTree();
 
     ~BinaryTree();
@@ -24,11 +27,11 @@ template <typename T> class BinaryTree {
 
     ArrayList<T> post_order() const;
 
-  private:
+   private:
     struct Node {
         explicit Node(const T &data_) {
-            data = data_;
-            left = nullptr;
+            data  = data_;
+            left  = nullptr;
             right = nullptr;
         }
 
@@ -70,8 +73,8 @@ template <typename T> class BinaryTree {
             }
 
             if (arv->left != nullptr && arv->right != nullptr) {
-                Node *min = arv->right->getMinimum();
-                arv->data = min->data;
+                Node *min  = arv->right->getMinimum();
+                arv->data  = min->data;
                 arv->right = remove(arv->right, min->data);
                 return arv;
             }
@@ -102,7 +105,7 @@ template <typename T> class BinaryTree {
                 } else {
                     return false;
                 }
-            } else { // data_ > data
+            } else {  // data_ > data
                 if (right != nullptr) {
                     return right->contains(data_);
                 } else {
@@ -153,16 +156,18 @@ template <typename T> class BinaryTree {
     std::size_t size_;
 };
 
-} // namespace structures
+}  // namespace structures
 
 //-------------------------------------
 
-template <typename T> structures::BinaryTree<T>::BinaryTree() {
-    root = nullptr;
+template <typename T>
+structures::BinaryTree<T>::BinaryTree() {
+    root  = nullptr;
     size_ = 0;
 }
 
-template <typename T> structures::BinaryTree<T>::~BinaryTree() {
+template <typename T>
+structures::BinaryTree<T>::~BinaryTree() {
     if (root != nullptr) {
         structures::ArrayList<T> list_nodes = pre_order();
         while (!list_nodes.empty()) {
@@ -171,7 +176,8 @@ template <typename T> structures::BinaryTree<T>::~BinaryTree() {
     }
 }
 
-template <typename T> void structures::BinaryTree<T>::insert(const T &data) {
+template <typename T>
+void structures::BinaryTree<T>::insert(const T &data) {
     if (contains(data)) {
         throw std::out_of_range("Elemento já está presente.");
     }
@@ -183,17 +189,19 @@ template <typename T> void structures::BinaryTree<T>::insert(const T &data) {
     size_++;
 }
 
-template <typename T> void structures::BinaryTree<T>::remove(const T &data) {
+template <typename T>
+void structures::BinaryTree<T>::remove(const T &data) {
     if (root != nullptr) {
         Node *p = root;
-        p = p->remove(p, data);
+        p       = p->remove(p, data);
         if (p != nullptr) {
             size_--;
         }
     }
 }
 
-template <typename T> bool structures::BinaryTree<T>::contains(const T &data) const {
+template <typename T>
+bool structures::BinaryTree<T>::contains(const T &data) const {
     if (root != nullptr) {
         return root->contains(data);
     } else {
@@ -201,15 +209,18 @@ template <typename T> bool structures::BinaryTree<T>::contains(const T &data) co
     }
 }
 
-template <typename T> bool structures::BinaryTree<T>::empty() const {
+template <typename T>
+bool structures::BinaryTree<T>::empty() const {
     return size() == 0;
 }
 
-template <typename T> std::size_t structures::BinaryTree<T>::size() const {
+template <typename T>
+std::size_t structures::BinaryTree<T>::size() const {
     return size_;
 }
 
-template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::pre_order() const {
+template <typename T>
+structures::ArrayList<T> structures::BinaryTree<T>::pre_order() const {
     structures::ArrayList<T> L;
     if (root != nullptr) {
         root->pre_order(L);
@@ -217,7 +228,8 @@ template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::pre_or
     return L;
 }
 
-template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::in_order() const {
+template <typename T>
+structures::ArrayList<T> structures::BinaryTree<T>::in_order() const {
     structures::ArrayList<T> L;
     if (root != nullptr) {
         root->in_order(L);
@@ -225,7 +237,8 @@ template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::in_ord
     return L;
 }
 
-template <typename T> structures::ArrayList<T> structures::BinaryTree<T>::post_order() const {
+template <typename T>
+structures::ArrayList<T> structures::BinaryTree<T>::post_order() const {
     structures::ArrayList<T> L;
     if (root != nullptr) {
         root->post_order(L);
