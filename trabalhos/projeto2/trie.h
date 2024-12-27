@@ -1,4 +1,4 @@
-// Copyright 2024 Vinicius Henrique Ribeiro
+// Copyright 2024 Vinicius Henrique Ribeiro e Enzo Amaral custodio
 
 #ifndef _TRIE_H_
 #define _TRIE_H_
@@ -16,17 +16,25 @@ class Trie {
 
     ~Trie() { delete root_; }
 
+    // função que chama o insert da classe privada NoTrie
     void insert(const std::string &palavra, const size_t posicao, const size_t comprimento) {
+        // verifica se já contém a palavra
         if (!contains(palavra)) {
-            root_->n_prefixos_ += root_->insert(root_, palavra, 0, posicao, comprimento);
+            // o retorno é somado na quantidade de prefixos do nodo chamador
+            root_->insert(root_, palavra, 0, posicao, comprimento);
+            root_->n_prefixos_++;
+            // incrementa a quantidade de palavras na Trie
             size_ += palavra.size();
         }
     }
 
+    // retorna true se contém palavra
     bool contains(const std::string &palavra) const { return root_->contains(palavra); }
 
+    // quantidade de prefixos de uma string
     size_t prefix_of(const std::string &palavra) const { return root_->prefix_of(palavra); }
 
+    // pega a posição da palavra no arquivo dic
     size_t posicao(const std::string &palavra) const {
         if (contains(palavra)) {
             return root_->posicao(palavra);
@@ -35,6 +43,7 @@ class Trie {
         return 0;
     }
 
+    // quantidade de chars da palavra + descrição
     size_t comprimento(const std::string &palavra) const {
         if (contains(palavra)) {
             return root_->comprimento(palavra);
@@ -43,6 +52,7 @@ class Trie {
         return 0;
     }
 
+    // true se vazia
     bool empty() const { return size_ == 0; }
 
     std::size_t size() const { return size_; }
@@ -65,23 +75,22 @@ class Trie {
         size_t comprimento_;  // comprimento da palavra + descrição
         size_t n_prefixos_;
 
-        size_t insert(NoTrie *node, const std::string &palavra, size_t index, const size_t &posicao, const size_t &comprimento) {
+        void insert(NoTrie *node, const std::string &palavra, size_t index, const size_t &posicao, const size_t &comprimento) {
+            // pega o index do filho
+            size_t index_filho = palavra[index] - 'a';
+            // quando estiver na última letra da palavra, adiciona os dados (comprimento, posição e númerod e prefixos) ao nodo
             if (index >= palavra.size()) {
                 node->posicao_     = posicao;
                 node->comprimento_ = comprimento;
                 node->n_prefixos_  = 1;
-                return 1;
-            }
-
-            size_t index_filho = palavra[index] - 'a';
-            if (node->filhos_[index_filho] == nullptr) {
+            } else if (node->filhos_[index_filho] == nullptr) {  // adiciona uma letra nos filhos caso o nodo atual não tenha
                 node->filhos_[index_filho] = new NoTrie(palavra[index]);
-                node->n_prefixos_ += insert(node->filhos_[index_filho], palavra, ++index, posicao, comprimento);
-                return 1;
+                insert(node->filhos_[index_filho], palavra, ++index, posicao, comprimento);
+                node->n_prefixos_++;
+            } else {  // nodo atual tem filho mas ainda não é a última letra
+                insert(node->filhos_[index_filho], palavra, ++index, posicao, comprimento);
+                node->n_prefixos_++;
             }
-
-            node->n_prefixos_ += insert(node->filhos_[index_filho], palavra, ++index, posicao, comprimento);
-            return 1;
         }
 
         bool contains(const std::string &palavra) const {
@@ -90,6 +99,7 @@ class Trie {
             return aux != nullptr && aux->comprimento_ > 0;
         }
 
+        // vai até a último nodo para retornar o número de prefixos
         size_t prefix_of(const std::string &palavra) const {
             const NoTrie *aux = get_node(this, palavra);
 
@@ -98,6 +108,7 @@ class Trie {
             return aux->n_prefixos_;
         }
 
+        // vai até a último nodo para retornar a posição no dic
         size_t posicao(const std::string &palavra) const {
             const NoTrie *node = get_node(this, palavra);
 
@@ -106,6 +117,7 @@ class Trie {
             return node->posicao_;
         }
 
+        // vai até a último nodo para retornar o comprimento
         size_t comprimento(const std::string &palavra) const {
             const NoTrie *node = get_node(this, palavra);
 
@@ -115,6 +127,7 @@ class Trie {
         }
 
        private:
+        // auxiliar para posicionar um ponteiro para o nodo que guarda a última letra da palavra no argumento
         const NoTrie *get_node(const NoTrie *node, const std::string &palavra) const {
             if (node == nullptr) return nullptr;
 

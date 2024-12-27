@@ -1,4 +1,4 @@
-// Copyright 2024 Vinicius Henrique Ribeiro
+// Copyright 2024 Vinicius Henrique Ribeiro e Enzo Amaral custodio
 
 #ifndef _LEITORDIC_H_
 #define _LEITORDIC_H_
@@ -17,6 +17,7 @@ class LeitorDIC {
         delete file_;
     }
 
+    // abre o arquivo para leitura
     bool abrir_arquivo(std::string path_file) {
         file_ = new std::ifstream(path_file);
         if (!file_->is_open()) {
@@ -26,6 +27,7 @@ class LeitorDIC {
         return true;
     }
 
+    // itera sobre o arquivo linha por linha
     bool ler_linha() {
         std::string linha;
         if (file_->is_open() && !file_->eof()) {
@@ -42,6 +44,7 @@ class LeitorDIC {
     std::string Descricao() { return descricao_; }
 
    private:
+    // faz o processamento da linha, dividindo em palavra e descrição
     void extrai_dados(std::string &linha) {
         size_t tam_linha = linha.size();
         size_t index     = 0;
